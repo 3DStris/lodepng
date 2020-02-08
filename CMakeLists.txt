@@ -22,7 +22,7 @@ target_link_libraries(pngdetail PRIVATE ${CMAKE_PROJECT_NAME}_util)
 add_library(${CMAKE_PROJECT_NAME}::${CMAKE_PROJECT_NAME} ALIAS ${CMAKE_PROJECT_NAME})
 add_library(${CMAKE_PROJECT_NAME}::${CMAKE_PROJECT_NAME}_util ALIAS ${CMAKE_PROJECT_NAME}_util)
 
-option(ENABLE_TESTING "enable creation of unittest" ON)
+option(ENABLE_TESTING "enable creation of unittest" OFF)
 if(ENABLE_TESTING)
   enable_testing()
   add_executable(${CMAKE_PROJECT_NAME}_unittest lodepng_unittest.cpp)
