@@ -2,71 +2,71 @@ cmake_minimum_required(VERSION 3.1)
 project(lodepng)
 
 # define target to install and link tests against
-add_library(${CMAKE_PROJECT_NAME}
+add_library(lodepng
   lodepng.h
   lodepng.cpp)
-target_include_directories(${CMAKE_PROJECT_NAME}
+target_include_directories(lodepng
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
-add_library(${CMAKE_PROJECT_NAME}_util
+add_library(lodepng_util
   lodepng_util.h
   lodepng_util.cpp)
-target_link_libraries(${CMAKE_PROJECT_NAME}_util PUBLIC ${CMAKE_PROJECT_NAME})
+target_link_libraries(lodepng_util PUBLIC lodepng)
 add_executable(pngdetail
   pngdetail.cpp)
-target_link_libraries(pngdetail PRIVATE ${CMAKE_PROJECT_NAME}_util)
+target_link_libraries(pngdetail PRIVATE lodepng_util)
 
 # ALIAS same as in configure file
 # the ALIAS can be used to create examples which use the same syntax as a client
 # application, which uses `find_package(lodepng CONFIG)`
 # create the alias lodepng::lodepng
-add_library(${CMAKE_PROJECT_NAME}::${CMAKE_PROJECT_NAME} ALIAS ${CMAKE_PROJECT_NAME})
-add_library(${CMAKE_PROJECT_NAME}::${CMAKE_PROJECT_NAME}_util ALIAS ${CMAKE_PROJECT_NAME}_util)
+add_library(lodepng::lodepng ALIAS lodepng)
+add_library(lodepng::lodepng_util ALIAS lodepng_util)
 
 option(ENABLE_TESTING "enable creation of unittest" OFF)
 if(ENABLE_TESTING)
   enable_testing()
-  add_executable(${CMAKE_PROJECT_NAME}_unittest lodepng_unittest.cpp)
+  add_executable(lodepng_unittest lodepng_unittest.cpp)
   # add compiler flags for test target only for GCC and Clang
-  target_compile_options(${CMAKE_PROJECT_NAME}_unittest PRIVATE
+  target_compile_options(lodepng_unittest PRIVATE
     $<BUILD_INTERFACE:
       $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
         -Werror -Wall -pedantic>>
     )
 
-  add_test(test_${CMAKE_PROJECT_NAME}_unittest ${CMAKE_PROJECT_NAME}_unittest)
-  target_link_libraries(${CMAKE_PROJECT_NAME}_unittest PRIVATE ${CMAKE_PROJECT_NAME}_util)
+  add_test(test_lodepng_unittest lodepng_unittest)
+  target_link_libraries(lodepng_unittest PRIVATE lodepng_util)
 endif()
 
-option(BUILD_EXAMPLES "build examples using ${CMAKE_PROJECT_NAME}" OFF)
+option(BUILD_EXAMPLES "build examples using lodepng" OFF)
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-option(BUILD_BENCHMARK "build benchmark for ${CMAKE_PROJECT_NAME}, requires SDL2" OFF)
+option(BUILD_BENCHMARK "build benchmark for lodepng, requires SDL2" OFF)
 if(BUILD_BENCHMARK)
-  add_executable(${CMAKE_PROJECT_NAME}_benchmark lodepng_benchmark.cpp)
-  target_link_libraries(${CMAKE_PROJECT_NAME}_benchmark PRIVATE ${CMAKE_PROJECT_NAME}::${CMAKE_PROJECT_NAME})
+  add_executable(lodepng_benchmark lodepng_benchmark.cpp)
+  target_link_libraries(lodepng_benchmark PRIVATE lodepng::lodepng)
   # SDL2 Dependency
   find_package(SDL2 CONFIG REQUIRED)
   if (TARGET SDL2::SDL2)
     message(STATUS "using TARGET SDL2::SDL2")
-    target_link_libraries(${CMAKE_PROJECT_NAME}_benchmark PUBLIC SDL2::SDL2)
+    target_link_libraries(lodepng_benchmark PUBLIC SDL2::SDL2)
   else()
     message(STATUS "no TARGET SDL2::SDL2, or SDL2, using variables")
-    target_include_directories(${CMAKE_PROJECT_NAME}_benchmark PUBLIC $<BUILD_INTERFACE:${SDL2_INCLUDE_DIRS}>)
-    target_link_libraries(${CMAKE_PROJECT_NAME}_benchmark PUBLIC ${SDL2_LIBRARIES})
+    target_include_directories(lodepng_benchmark PUBLIC $<BUILD_INTERFACE:${SDL2_INCLUDE_DIRS}>)
+    target_link_libraries(lodepng_benchmark PUBLIC ${SDL2_LIBRARIES})
   endif()
-  add_custom_target(benchmark COMMAND ${CMAKE_PROJECT_NAME}_benchmark)
+  add_custom_target(benchmark COMMAND lodepng_benchmark)
 endif()
 
 # create install target
 include(GNUInstallDirs)
 install(
   TARGETS
-  ${CMAKE_PROJECT_NAME}
-  ${CMAKE_PROJECT_NAME}_util
+  lodepng
+  lodepng_util
   pngdetail
-  EXPORT ${CMAKE_PROJECT_NAME}-targets
+  EXPORT lodepng-targets
   INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # set include path for installed library target
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -98,7 +98,7 @@ install(
 )
 # install targets file
 install(
-  EXPORT "${CMAKE_PROJECT_NAME}-targets"
-  NAMESPACE "${CMAKE_PROJECT_NAME}::"
+  EXPORT "lodepng-targets"
+  NAMESPACE "lodepng::"
   DESTINATION "lib/cmake/lodepng"
 )
